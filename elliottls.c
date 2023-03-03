@@ -4,6 +4,7 @@
 #include <errno.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <stdbool.h>
 
 #define ANSI_COLOR_RED     "\x1b[31m"
 #define ANSI_COLOR_GREEN   "\x1b[32m"
@@ -31,12 +32,12 @@ Print file content
 
 
 Print size of file
--sizeFile [fileName]
+-bufferFile [fileName]
 printf("%ld\n", (long long)someVar); 
 */
 
 
-off_t sizebig(const char *filename) {
+off_t sizeFile(const char *filename) {
     struct stat st; 
 
     if (stat(filename, &st) == 0)
@@ -47,10 +48,32 @@ off_t sizebig(const char *filename) {
 }
 int main( int argc, char *argv[] )
 {
+    bool debug = false;
+    
     if (argc > 1){
+
+            for (int i = 0; i<argc; i++)
+            {
+                if (strcmp("-debug",argv[i]) == 0)
+                {
+                    debug = true; // Enable debug flag
+                    printf(ANSI_COLOR_RED"DEBUG MODE\n\n"ANSI_COLOR_RESET"Arguments passed:\n");
+                    for (int i = 0; i<argc; i++) printf("%d \t %s \n", i, argv[i]); // List arguments passed
+                    printf("\n");
+                }
+            }
+            
+        
         if (strcmp("-newFile",argv[1]) == 0 ) 
         {
-            createFile(argv[2]);
+            if (debug){
+                printf("newFile");
+                createFile(argv[2]);
+            }
+            else{
+                createFile(argv[2]);
+            }
+            
         }
         else if (strcmp("-readFile",argv[1]) == 0 )
         {
@@ -59,50 +82,45 @@ int main( int argc, char *argv[] )
         else if (strcmp("-sizeFile",argv[1]) == 0 )
         {
             long double size;
-            size = (long double)sizebig(argv[2]);
+            size = (long double)sizeFile(argv[2]);
             // Terrabytes
             if (size > (long double)1073741824000)
             {
-                size = ((long double)sizebig(argv[2])/((1000*1000*1000*1000)));
+                size = ((long double)sizeFile(argv[2])/((1000*1000*1000*1000)));
                 printf("File:"ANSI_COLOR_GREEN" %s \n"ANSI_COLOR_RESET"Size:"ANSI_COLOR_RED" %.2Lf TB\n",argv[2],size);
             }
             // Gigabytes
             else if (size > (long double)1073741824)
             {
-                size = ((long double)sizebig(argv[2])/((1000*1000*1000)));
+                size = ((long double)sizeFile(argv[2])/((1000*1000*1000)));
                 printf("File: "ANSI_COLOR_GREEN"%s \n"ANSI_COLOR_RESET"Size:"ANSI_COLOR_MAGENTA" %.2Lf GB\n"ANSI_COLOR_RESET"",argv[2],size);
             }
             // Megabytes
             else if (size > (long double)1048576)
             {
-                size = ((long double)sizebig(argv[2])/((1000*1000)));
+                size = ((long double)sizeFile(argv[2])/((1000*1000)));
                 printf("File: "ANSI_COLOR_GREEN"%s \n"ANSI_COLOR_RESET"Size:"ANSI_COLOR_YELLOW" %.2Lf MB\n"ANSI_COLOR_RESET"",argv[2],size);
             }
             // Kilobytes
             else if (size > (long double)1024)
             {
-                size = ((long double)sizebig(argv[2])/(1000));
+                size = ((long double)sizeFile(argv[2])/(1000));
                 printf("File: "ANSI_COLOR_GREEN"%s \n"ANSI_COLOR_RESET"Size:"ANSI_COLOR_BLUE" %.2Lf KB\n"ANSI_COLOR_RESET"",argv[2],size);
             }
             // Bytes
             else
             {
-                size = ((long double)sizebig(argv[2]));
+                size = ((long double)sizeFile(argv[2]));
                 printf("File: "ANSI_COLOR_GREEN"%s \n"ANSI_COLOR_RESET"Size:"ANSI_COLOR_GREEN" %Lf Bytes\n"ANSI_COLOR_RESET"",argv[2],size);
             }
             
         }
         else if (strcmp("-help",argv[1]) == 0 )
         {
-            printf( ANSI_COLOR_GREEN "\nThe aims of this program:\n\nArguments:\n\nHelp menu (This)"ANSI_COLOR_RESET"\n-help\n\n"ANSI_COLOR_GREEN"Create new file"ANSI_COLOR_RESET"\n-newfile [fileName]\n\n\n"ANSI_COLOR_GREEN"Print file content"ANSI_COLOR_RESET"\n-readFile [fileName]"ANSI_COLOR_GREEN"\n\n\nPrint size of file"ANSI_COLOR_RESET"\n-sizeFile [fileName]\n\n");
+            printf( ANSI_COLOR_GREEN "\nThe aims of this program:\n\nArguments:\n\nHelp menu (This)"ANSI_COLOR_RESET"\n-help\n\n"ANSI_COLOR_GREEN"Create new file"ANSI_COLOR_RESET"\n-newfile [fileName]\n\n\n"ANSI_COLOR_GREEN"Print file content"ANSI_COLOR_RESET"\n-readFile [fileName]"ANSI_COLOR_GREEN"\n\n\nPrint size of file"ANSI_COLOR_RESET"\n-bufferFile [fileName]\n\n");
         }
+        
     }
-    else
-    {
-        printf("Incorrrect arguments, use "ANSI_COLOR_GREEN"-help"ANSI_COLOR_RESET" for more information.\n");
-        return 1;
-    }
-    return 1;
 }
 
 void createFile(char fileName[])
@@ -126,20 +144,7 @@ void createFile(char fileName[])
     close(fd); // Closes file descriptors for reuse
 }
 
-void readFile(char fileName[])
-{
-    int size;
-    size = (int)sizebig(fileName);
-
-    FILE* fp;
-    fp = fopen(fileName, "r");
-    char string[size];
-
-    fgets(string,size,fp);
-    fclose(fp);
-}
-
-int sizeFile(char fileName[])
+int bufferFile(char fileName[])
 {
     int status;
     struct stat st;
@@ -148,6 +153,22 @@ int sizeFile(char fileName[])
         st.st_size;
     }
     return st.st_size;
+}
+
+void readFile(char fileName[])
+{
+    FILE* fp;
+    int size;
+
+    size = (int)bufferFile(fileName);
+    printf("%i",size);
+    
+    fp = fopen(fileName, "r");
+    char string[size];
+
+    fgets(string,size,fp);
+    printf("%s\n",string);
+    fclose(fp);
 }
 
 /*
