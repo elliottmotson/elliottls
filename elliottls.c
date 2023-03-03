@@ -129,7 +129,7 @@ void createFile(char fileName[])
 void readFile(char fileName[])
 {
     int size;
-    size = sizeFile(fileName);
+    size = (int)sizebig(fileName);
 
     FILE* fp;
     fp = fopen(fileName, "r");
@@ -147,7 +147,6 @@ int sizeFile(char fileName[])
     if(status == 0) {
         st.st_size;
     }
-    printf("%lld\n",st.st_size);
     return st.st_size;
 }
 
