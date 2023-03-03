@@ -46,7 +46,6 @@ If you have any feedback, please reach out to us at fake@fake.com
 
 ```elliottls -readFile [fileName]```
 
-![readFile](https://via.placeholder.com/468x300?text=App+Screenshot+Here)
 
 #### Print size of file
 
