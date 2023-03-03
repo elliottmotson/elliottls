@@ -37,19 +37,70 @@ printf("%ld\n", (long long)someVar);
 */
 
 
-off_t sizeFile(const char *filename) {
+void createFile(char fileName[])
+{
+    int fd;
+    char text[1024];
+
+    printf("Enter file data or [ENTER] to make blank\n");
+    
+    scanf("%[^\n]", text) == 10;
+
+    fd = open(fileName, O_WRONLY | O_CREAT, 0644); // Read only OR Create file, 0644 access mode of file
+    if (fd < 0)
+    {
+        printf("error number %d\n", errno);
+        perror("Foo");
+        exit(1);
+    }
+
+    write(fd,text, strlen(text)); // file, buffer, count(buffer size)
+    close(fd); // Closes file descriptors for reuse
+}
+
+int bufferFile(char fileName[])
+{
+    int status;
+    struct stat st;
+    status = stat(fileName, &st);
+    if(status == 0) {
+        st.st_size;
+    }
+    return st.st_size;
+}
+
+void readFile(char fileName[])
+{
+    FILE* fp;
+    int size;
+
+    size = (int)bufferFile(fileName);
+    printf("%i",size);
+    
+    fp = fopen(fileName, "r");
+    char string[size];
+
+    fgets(string,size,fp);
+    printf("%s\n",string);
+    fclose(fp);
+}
+
+off_t sizeFile(const char *filename) 
+{
     struct stat st; 
 
     if (stat(filename, &st) == 0)
     {
         return st.st_size;
     }
-    return -1; 
+    return -1;
 }
+
+/*  Entry point */
 int main( int argc, char *argv[] )
 {
+    // Debug flag
     bool debug = false;
-    
     if (argc > 1){
 
             for (int i = 0; i<argc; i++)
@@ -123,53 +174,8 @@ int main( int argc, char *argv[] )
     }
 }
 
-void createFile(char fileName[])
-{
-    int fd;
-    char text[1024];
 
-    printf("Enter file data or [ENTER] to make blank\n");
-    
-    scanf("%[^\n]", text) == 10;
 
-    fd = open(fileName, O_WRONLY | O_CREAT, 0644); // Read only OR Create file, 0644 access mode of file
-    if (fd < 0)
-    {
-        printf("error number %d\n", errno);
-        perror("Foo");
-        exit(1);
-    }
-
-    write(fd,text, strlen(text)); // file, buffer, count(buffer size)
-    close(fd); // Closes file descriptors for reuse
-}
-
-int bufferFile(char fileName[])
-{
-    int status;
-    struct stat st;
-    status = stat(fileName, &st);
-    if(status == 0) {
-        st.st_size;
-    }
-    return st.st_size;
-}
-
-void readFile(char fileName[])
-{
-    FILE* fp;
-    int size;
-
-    size = (int)bufferFile(fileName);
-    printf("%i",size);
-    
-    fp = fopen(fileName, "r");
-    char string[size];
-
-    fgets(string,size,fp);
-    printf("%s\n",string);
-    fclose(fp);
-}
 
 /*
 Notes
