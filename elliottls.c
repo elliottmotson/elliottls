@@ -140,7 +140,7 @@ int main( int argc, char *argv[] )
             if (size > (long double)1073741824000)
             {
                 size = ((long double)sizeFile(argv[2])/((1000*1000*1000*1000)));
-                printf("File:"ANSI_COLOR_GREEN" %s \n"ANSI_COLOR_RESET"Size:"ANSI_COLOR_RED" %.2Lf TB\n",argv[2],size);
+                printf("File:"ANSI_COLOR_GREEN" %s \n"ANSI_COLOR_RESET"Size:"ANSI_COLOR_RED" %.1Lf TB\n",argv[2],size);
             }
             // Gigabytes
             else if (size > (long double)1073741824)
